@@ -13,7 +13,7 @@ set $mod Mod4
 
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
-font pango:monospace 14
+font pango:FiraCode Nerd Font Mono 14
 
 # This font is widely installed, provides lots of unicode glyphs, right-to-left
 # text rendering and scalability on retina/hidpi displays (thanks to pango).
@@ -189,6 +189,36 @@ bindsym $mod+r mode "resize"
 #        status_command i3status
 #}
 
+######################################
+# color settings for bar and windows #
+######################################
+
+# Define colors variables:
+set $darkbluetrans 	#313244
+set $darkblue		#b4befe
+set $lightblue	        #eba0ac
+#set $urgentred		#e53935
+
+set $urgentred		#f38ba8
+set $white		#cdd6f4
+set $black		#1e1e2e
+set $purple		#6870A1
+set $darkgrey		#383c4a
+set $grey		#b0b5bd
+set $mediumgrey		#8b8b8b
+set $yellowbrown	#e1b700
+
+# define colors for windows:
+#class		        	border		bground		text		indicator	child_border
+
+client.focused		    	$darkblue       $black          $white		$darkblue	$darkblue
+client.unfocused	    	$purple	 	 $black   	$grey		$darkgrey		$darkgrey
+client.focused_inactive		$black   	$black  	$grey		$darkgrey		$darkgrey
+client.urgent		    	$urgentred	$urgentred	$white		$darkblue	$yellowbrown
+
+gaps inner 10px
+smart_gaps on
+
 # enable polybar
 exec_always --no-startup-id $HOME/.config/polybar/launch.sh
 
@@ -202,3 +232,5 @@ exec_always --no-startup-id autotiling
 
 # setup wallpaper
 exec_always nitrogen --restore
+
+focus_follows_mouse no
