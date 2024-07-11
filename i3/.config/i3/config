@@ -225,10 +225,16 @@ exec_always --no-startup-id $HOME/.config/polybar/launch.sh
 # auto move spotify to workspace 5
 for_window [class="Spotify"] move to workspace number $ws5
 
+# remove window's title
+for_window [class="^.*"] border pixel 0
+
 # auto move discord to workspace 4
 assign [class="discord"] 4
 
 exec_always --no-startup-id autotiling
+
+exec_always --no-startup-id xset s off
+exec_always --no-startup-id xset -dpms
 
 # setup wallpaper
 exec_always nitrogen --restore
