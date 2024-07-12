@@ -240,3 +240,6 @@ exec_always --no-startup-id xset -dpms
 exec_always nitrogen --restore
 
 focus_follows_mouse no
+
+# adding keybind for screenshot using maim
+bindsym $mod+Shift+S exec maim -s | xclip -selection clipboard -t image/png
