@@ -185,9 +185,9 @@ bindsym $mod+r mode "resize"
 
 # Start i3bar to display a workspace bar (plus the system information i3status
 # finds out, if available)
-#bar {
-#        status_command i3status
-#}
+bar {
+        status_command i3status -c $HOME/.config/i3status/i3status.conf
+}
 
 ######################################
 # color settings for bar and windows #
@@ -216,11 +216,11 @@ client.unfocused	    	$purple	 	 $black   	$grey		$darkgrey		$darkgrey
 client.focused_inactive		$black   	$black  	$grey		$darkgrey		$darkgrey
 client.urgent		    	$urgentred	$urgentred	$white		$darkblue	$yellowbrown
 
-gaps inner 10px
-smart_gaps on
+#gaps inner 10px
+#smart_gaps on
 
 # enable polybar
-exec_always --no-startup-id $HOME/.config/polybar/launch.sh
+#exec_always --no-startup-id $HOME/.config/polybar/launch.sh
 
 # auto move spotify to workspace 5
 for_window [class="Spotify"] move to workspace number $ws5

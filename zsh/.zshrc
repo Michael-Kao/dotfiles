@@ -6,6 +6,7 @@ alias grep='grep --color=auto'
 alias vim='nvim'
 
 # this is for pure theme
+# github link: https://github.com/sindresorhus/pure
 fpath+=($HOME/.zsh/pure)
 
 export VCPKG_ROOT=/builds/vcpkg
