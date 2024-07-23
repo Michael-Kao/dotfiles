@@ -231,6 +231,9 @@ for_window [class="^.*"] border pixel 0
 # auto move discord to workspace 4
 assign [class="discord"] 4
 
+# auto move firefox to workspace 1
+assign [class="firefox"] 1
+
 exec_always --no-startup-id autotiling
 
 exec_always --no-startup-id xset s off

@@ -4,6 +4,7 @@
 alias ls='ls --color=auto'
 alias grep='grep --color=auto'
 alias vim='nvim'
+alias windows='sudo efibootmgr -n 0'
 
 # this is for pure theme
 # github link: https://github.com/sindresorhus/pure

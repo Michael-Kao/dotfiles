@@ -4,8 +4,7 @@ program = "/bin/zsh"
 [window]
 
 [font]
-normal.family = "FiraCode Nerd Font"
-normal.style = "Regular"
+normal = { family = "FiraCode Nerd Font Mono", style = "Regular" }
 size = 14
 
 [selection]
