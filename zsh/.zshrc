@@ -13,6 +13,10 @@ fpath+=($HOME/.zsh/pure)
 export VCPKG_ROOT=/builds/vcpkg
 export PATH=$VCPKG_ROOT:$PATH
 
+export GEM_HOME="$(ruby -e 'puts Gem.user_dir')"
+export PATH="$PATH:$GEM_HOME/bin"
+export PATH="$PATH:$/home/kao/.cargo/bin"
+
 autoload -Uz compinit promptinit
 compinit
 promptinit
