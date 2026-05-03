@@ -15,7 +15,7 @@ export PATH=$VCPKG_ROOT:$PATH
 
 export GEM_HOME="$(ruby -e 'puts Gem.user_dir')"
 export PATH="$PATH:$GEM_HOME/bin"
-export PATH="$PATH:$/home/kao/.cargo/bin"
+export PATH="$PATH:$HOME/.cargo/bin"
 
 autoload -Uz compinit promptinit
 compinit
@@ -26,5 +26,3 @@ prompt pure
 #prompt walters
 #
 #
-
-
