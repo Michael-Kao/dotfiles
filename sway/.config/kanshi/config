@@ -1,0 +1,60 @@
+# Automatic monitor profiles for Sway.
+#
+# Kanshi picks the first profile whose listed outputs match connected monitors.
+# Common connector names:
+#   - Laptop panel: eDP-1
+#   - Home DisplayPort monitor: DP-1, DP-2, DP-3, ...
+#   - Workplace HDMI monitor: HDMI-A-1, HDMI-A-2, ...
+#
+# If a machine uses different names, run:
+#   swaymsg -t get_outputs
+# then copy this file's closest profile and replace the output names.
+
+# Home desktop: main 1440p monitor on the left, 300Hz 1080p monitor on the right.
+# DP-2 = ASUS ROG XG279Q, DP-3 = ASUS VG259QMR5A.
+profile home-dual-dp {
+  output DP-2 enable mode 2560x1440@170.021Hz position 0,0
+  output DP-3 enable mode 1920x1080@300.004Hz position 2560,0
+}
+
+# Laptop/internal-display only.
+profile laptop {
+  output eDP-1 enable position 0,0
+}
+
+# Single external monitor only, useful for desktops or lid-closed docking.
+profile dp-only {
+  output DP-1 enable position 0,0
+}
+
+profile hdmi-only {
+  output HDMI-A-1 enable position 0,0
+}
+
+# Home: internal display on the left, DisplayPort monitor on the right.
+profile laptop-home-dp {
+  output eDP-1 enable position 0,0
+  output DP-1 enable position 2560,0
+}
+
+# Workplace: internal display on the left, HDMI monitor on the right.
+profile laptop-work-hdmi {
+  output eDP-1 enable position 0,0
+  output HDMI-A-1 enable position 2560,0
+}
+
+# Alternate connector numbers commonly seen on docks/GPUs.
+profile laptop-dp2 {
+  output eDP-1 enable position 0,0
+  output DP-2 enable position 2560,0
+}
+
+profile laptop-dp3 {
+  output eDP-1 enable position 0,0
+  output DP-3 enable position 2560,0
+}
+
+profile laptop-hdmi2 {
+  output eDP-1 enable position 0,0
+  output HDMI-A-2 enable position 2560,0
+}

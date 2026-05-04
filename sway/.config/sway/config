@@ -1,0 +1,205 @@
+# Sway config ported from i3/.config/i3/config.
+# Keep the i3-style keybindings/workspaces so the Wayland setup feels familiar.
+
+set $mod Mod4
+set $term kitty
+set $menu wofi --show drun --conf $HOME/.config/wofi/config --style $HOME/.config/wofi/style.css
+set $lock swaylock -f -c 000000
+set $refresh_status killall -SIGUSR1 i3status
+
+font pango:FiraCode Nerd Font Mono 14
+
+# Make Wayland/Sway environment visible to systemd/dbus-launched GUI apps.
+# Electron apps and xdg-desktop-portal need these after a fresh login.
+exec systemctl --user set-environment XDG_CURRENT_DESKTOP=sway
+exec systemctl --user import-environment DISPLAY WAYLAND_DISPLAY SWAYSOCK XDG_CURRENT_DESKTOP
+exec dbus-update-activation-environment --systemd DISPLAY WAYLAND_DISPLAY SWAYSOCK XDG_CURRENT_DESKTOP=sway
+
+# Start XDG autostart .desktop files and common tray utilities.
+exec dex --autostart --environment sway
+exec nm-applet --indicator
+
+# Daily apps.
+exec spotify
+exec discord
+
+# Create Voicemeeter-like AUX virtual output for per-app routing.
+exec_always /home/kao/.local/bin/audio-setup
+
+# Auto-apply monitor layouts when displays are plugged/unplugged.
+# Config lives in sway/.config/kanshi/config and supports laptop-only,
+# home DisplayPort, and workplace HDMI profiles.
+exec_always sh -c 'pkill kanshi; kanshi >/tmp/kanshi.log 2>&1 &'
+
+# Wayland-native idle/lock handling replaces xss-lock + i3lock.
+exec swayidle -w \
+  timeout 300 'swaylock -f -c 000000' \
+  before-sleep 'swaylock -f -c 000000'
+
+# Use Mouse+$mod to drag floating windows to their wanted position.
+floating_modifier $mod
+
+# Media keys. Keep i3status refresh behavior for the swaybar status line.
+bindsym XF86AudioRaiseVolume exec pactl set-sink-volume @DEFAULT_SINK@ +10% && $refresh_status
+bindsym XF86AudioLowerVolume exec pactl set-sink-volume @DEFAULT_SINK@ -10% && $refresh_status
+bindsym XF86AudioMute exec pactl set-sink-mute @DEFAULT_SINK@ toggle && $refresh_status
+bindsym XF86AudioMicMute exec pactl set-source-mute @DEFAULT_SOURCE@ toggle && $refresh_status
+
+# Basic app/window controls.
+bindsym $mod+Return exec $term
+bindsym $mod+q kill
+bindsym $mod+d exec $menu
+
+# Change focus.
+bindsym $mod+h focus left
+bindsym $mod+j focus down
+bindsym $mod+k focus up
+bindsym $mod+l focus right
+bindsym $mod+Left focus left
+bindsym $mod+Down focus down
+bindsym $mod+Up focus up
+bindsym $mod+Right focus right
+
+# Move focused window.
+bindsym $mod+Shift+h move left
+bindsym $mod+Shift+j move down
+bindsym $mod+Shift+k move up
+bindsym $mod+Shift+l move right
+bindsym $mod+Shift+Left move left
+bindsym $mod+Shift+Down move down
+bindsym $mod+Shift+Up move up
+bindsym $mod+Shift+Right move right
+
+# Layout controls.
+bindsym $mod+Control+h split h
+bindsym $mod+v split v
+bindsym $mod+f fullscreen toggle
+bindsym $mod+s layout stacking
+bindsym $mod+w layout tabbed
+bindsym $mod+e layout toggle split
+bindsym $mod+Shift+space floating toggle
+bindsym $mod+space focus mode_toggle
+bindsym $mod+a focus parent
+
+# Workspaces: same numbering as i3.
+set $ws1 "1"
+set $ws2 "2"
+set $ws3 "3"
+set $ws4 "4"
+set $ws5 "5"
+set $ws6 "6"
+set $ws7 "7"
+set $ws8 "8"
+set $ws9 "9"
+set $ws10 "10"
+
+bindsym $mod+1 workspace number $ws1
+bindsym $mod+2 workspace number $ws2
+bindsym $mod+3 workspace number $ws3
+bindsym $mod+4 workspace number $ws4
+bindsym $mod+5 workspace number $ws5
+bindsym $mod+6 workspace number $ws6
+bindsym $mod+7 workspace number $ws7
+bindsym $mod+8 workspace number $ws8
+bindsym $mod+9 workspace number $ws9
+bindsym $mod+0 workspace number $ws10
+
+bindsym $mod+Shift+1 move container to workspace number $ws1
+bindsym $mod+Shift+2 move container to workspace number $ws2
+bindsym $mod+Shift+3 move container to workspace number $ws3
+bindsym $mod+Shift+4 move container to workspace number $ws4
+bindsym $mod+Shift+5 move container to workspace number $ws5
+bindsym $mod+Shift+6 move container to workspace number $ws6
+bindsym $mod+Shift+7 move container to workspace number $ws7
+bindsym $mod+Shift+8 move container to workspace number $ws8
+bindsym $mod+Shift+9 move container to workspace number $ws9
+bindsym $mod+Shift+0 move container to workspace number $ws10
+
+# Default workspace placement for current home dual-monitor setup.
+# DP-2 is the main 2560x1440 monitor; DP-3 is the 1920x1080 300Hz side monitor.
+workspace $ws1 output DP-2
+workspace $ws2 output DP-2
+workspace $ws3 output DP-2
+workspace $ws4 output DP-2
+workspace $ws5 output DP-2
+workspace $ws6 output DP-2
+workspace $ws7 output DP-2
+workspace $ws8 output DP-3
+workspace $ws9 output DP-3
+workspace $ws10 output DP-3
+
+# Sway session controls.
+bindsym $mod+Shift+c reload
+bindsym $mod+Shift+r reload
+bindsym $mod+Shift+e exec swaynag -t warning -m 'Exit Sway? This will end your Wayland session.' -B 'Yes, exit sway' 'swaymsg exit'
+
+# Resize mode.
+mode "resize" {
+  bindsym h resize shrink width 10 px or 10 ppt
+  bindsym j resize grow height 10 px or 10 ppt
+  bindsym k resize shrink height 10 px or 10 ppt
+  bindsym l resize grow width 10 px or 10 ppt
+
+  bindsym Left resize shrink width 10 px or 10 ppt
+  bindsym Down resize grow height 10 px or 10 ppt
+  bindsym Up resize shrink height 10 px or 10 ppt
+  bindsym Right resize grow width 10 px or 10 ppt
+
+  bindsym Return mode "default"
+  bindsym Escape mode "default"
+  bindsym $mod+r mode "default"
+}
+bindsym $mod+r mode "resize"
+
+# Keep the old i3status bar for minimal config churn.
+bar {
+  status_command i3status -c $HOME/.config/i3status/i3status.conf
+}
+
+######################################
+# color settings for bar and windows #
+######################################
+set $darkbluetrans #313244
+set $darkblue #b4befe
+set $lightblue #eba0ac
+set $urgentred #f38ba8
+set $white #cdd6f4
+set $black #1e1e2e
+set $purple #6870A1
+set $darkgrey #383c4a
+set $grey #b0b5bd
+set $mediumgrey #8b8b8b
+set $yellowbrown #e1b700
+
+client.focused $darkblue $black $white $darkblue $darkblue
+client.unfocused $purple $black $grey $darkgrey $darkgrey
+client.focused_inactive $black $black $grey $darkgrey $darkgrey
+client.urgent $urgentred $urgentred $white $darkblue $yellowbrown
+
+# App placement. Use app_id for native Wayland apps and class for Xwayland apps.
+assign [app_id="firefox"] $ws1
+assign [class="firefox"] $ws1
+assign [app_id="steam"] $ws3
+assign [class="steam"] $ws3
+for_window [app_id="discord"] move to workspace number $ws8
+for_window [class="discord"] move to workspace number $ws8
+for_window [app_id="Spotify"] move to workspace number $ws9
+for_window [class="Spotify"] move to workspace number $ws9
+
+# Remove title bars like the i3 config did.
+default_border pixel 0
+default_floating_border pixel 0
+for_window [app_id=".*"] border pixel 0
+for_window [class=".*"] border pixel 0
+
+# Autotiling. Use an absolute path because Sway's startup environment may not
+# include ~/.local/bin even when an interactive shell does.
+exec /home/kao/.local/bin/autotiling
+
+# Wayland wallpaper replaces nitrogen. Change the path if your wallpaper lives elsewhere.
+exec_always sh -c 'pkill swaybg; [ -f "$HOME/Pictures/wallpaper.jpg" ] && swaybg -i "$HOME/Pictures/wallpaper.jpg" -m fill'
+
+focus_follows_mouse no
+
+# Wayland screenshot replaces maim + xclip.
+bindsym $mod+Shift+S exec grim -g "$(slurp)" - | wl-copy --type image/png

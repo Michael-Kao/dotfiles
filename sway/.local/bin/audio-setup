@@ -1,0 +1,77 @@
+#!/usr/bin/env sh
+
+# Create Voicemeeter-like virtual outputs on PipeWire's PulseAudio layer.
+#
+# AUX is a virtual sink you can select per app in pavucontrol.
+# A loopback mirrors AUX to the current default output so you can hear it.
+#
+# Usage:
+#   audio-setup          create/update AUX
+#   audio-setup unload   remove AUX modules
+
+set -eu
+
+AUX_SINK="aux"
+AUX_DESC="AUX"
+LOOPBACK_DESC="AUX to Default Output"
+
+wait_for_pulse() {
+  i=0
+  while ! pactl info >/dev/null 2>&1; do
+    i=$((i + 1))
+    if [ "$i" -ge 30 ]; then
+      echo "audio-setup: PulseAudio compatibility server is not available" >&2
+      exit 1
+    fi
+    sleep 1
+  done
+}
+
+unload_aux() {
+  pactl list modules short | while read -r id _ args; do
+    case "$args" in
+      *"sink_name=$AUX_SINK"*|*"source=$AUX_SINK.monitor"*|*"$LOOPBACK_DESC"*)
+        pactl unload-module "$id" >/dev/null 2>&1 || true
+        ;;
+    esac
+  done
+}
+
+aux_sink_exists() {
+  pactl list short sinks | awk '{print $2}' | grep -qx "$AUX_SINK"
+}
+
+aux_loopback_exists() {
+  pactl list modules short | grep -q "source=$AUX_SINK.monitor"
+}
+
+wait_for_pulse
+
+case "${1:-setup}" in
+  unload)
+    unload_aux
+    exit 0
+    ;;
+  setup)
+    ;;
+  *)
+    echo "usage: audio-setup [setup|unload]" >&2
+    exit 2
+    ;;
+esac
+
+if ! aux_sink_exists; then
+  pactl load-module module-null-sink \
+    sink_name="$AUX_SINK" \
+    sink_properties="device.description=$AUX_DESC" >/dev/null
+fi
+
+if ! aux_loopback_exists; then
+  pactl load-module module-loopback \
+    source="$AUX_SINK.monitor" \
+    sink="@DEFAULT_SINK@" \
+    latency_msec=30 \
+    media.name="$LOOPBACK_DESC" >/dev/null
+fi
+
+echo "audio-setup: AUX virtual output is ready"

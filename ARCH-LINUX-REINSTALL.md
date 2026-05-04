@@ -11,15 +11,19 @@ Stow targets in this repo:
 - `zsh` -> `~/.zshrc`, `~/.zprofile`
 - `nvim` -> `~/.config/nvim` (Git submodule: `kickstart.nvim`)
 - `alacritty` -> `~/.config/alacritty/alacritty.toml`
+- `kitty` -> `~/.config/kitty/kitty.conf`
 - `vim` -> `~/.vimrc`
 - `x` -> `~/.xinitrc`, `~/.xprofile`
+- `sway` -> `~/.config/sway`
+- `sway` also manages `~/.config/wofi`, `~/.config/kanshi`, local Electron launchers, and Sway helper scripts
 - `i3` -> `~/.config/i3`, `~/.config/i3status`
 - `picom` -> `~/.config/picom`
 - `polybar` -> `~/.config/polybar`
 - `dunst` -> `~/.config/dunst`
+- `fontconfig` -> `~/.config/fontconfig` CJK/emoji fallback for Firefox and GUI apps
 - `fonts` -> `~/.local/share/fonts`
 
-Do not stow only `zsh nvim alacritty vim x`; that misses active configs.
+Do not stow only `zsh nvim alacritty vim x`; that misses active configs such as `sway`, `fonts`, and notification/bar configs.
 
 ## 0. Pre-flight
 
@@ -127,6 +131,43 @@ yay -S --needed \
   htop fzf ripgrep stow lazygit fontconfig
 ```
 
+### Audio / PipeWire
+
+```bash
+yay -S --needed \
+  pipewire pipewire-audio pipewire-alsa pipewire-pulse wireplumber \
+  pavucontrol qpwgraph helvum easyeffects
+
+systemctl --user enable --now pipewire.socket pipewire-pulse.socket wireplumber.service
+systemctl --user restart pipewire pipewire-pulse wireplumber
+```
+
+Verify PulseAudio compatibility is provided by PipeWire:
+
+```bash
+pactl info | grep 'Server Name'
+wpctl status
+```
+
+Expected: `Server Name: PulseAudio (on PipeWire ...)`. If `pavucontrol` hangs on `Establishing connection to PulseAudio`, `pipewire-pulse.socket` is probably inactive or `pipewire-alsa` is missing.
+
+The `sway` stow target provides `audio-setup`, which creates a Voicemeeter-like virtual output named `AUX` and loops it back to the default output:
+
+```bash
+audio-setup
+pactl list short sinks | grep aux
+```
+
+Use `pavucontrol` -> Playback to move Spotify, Firefox, Discord, etc. to `AUX` or another physical output.
+
+AUX usage summary:
+
+- `AUX` is a virtual output/sink for separating app audio.
+- `AUX.monitor` is the monitor source for anything sent to AUX.
+- `audio-setup` also creates a loopback from `AUX.monitor` to the current default output, so AUX audio remains audible.
+- In `pavucontrol` -> Playback, select `AUX` for apps you want separated.
+- If the physical default output changes, recreate the loopback with `audio-setup unload && audio-setup`.
+
 `neofetch` is optional/unmaintained; do not fail the reinstall if it is unavailable.
 
 ### Terminal and fonts
@@ -134,14 +175,57 @@ yay -S --needed \
 ```bash
 yay -S --needed \
   alacritty kitty \
-  ttf-firacode-nerd ttf-jetbrains-mono-nerd
+  ttf-firacode-nerd ttf-jetbrains-mono-nerd \
+  noto-fonts noto-fonts-cjk noto-fonts-emoji
 ```
 
 This repo also includes bundled Nerd Fonts under `fonts/.local/share/fonts`; stowing `fonts` plus `fc-cache` is enough if AUR font names change.
 
-### X11/i3 stack used by this repo
+### Wayland/Sway stack used by this repo
 
-The checked-in desktop configs are primarily X11/i3-related:
+Sway is the daily-driver window manager. The `sway` stow target ports the old i3 keybindings/workspace behavior to Wayland while keeping `i3status` for the bar.
+
+```bash
+yay -S --needed \
+  sway swaybg swayidle swaylock \
+  kanshi wofi mako wl-clipboard grim slurp \
+  xorg-xwayland xdg-desktop-portal xdg-desktop-portal-wlr xdg-desktop-portal-gtk \
+  i3status dex network-manager-applet \
+  libpulse pipewire pipewire-pulse \
+  fcitx5 fcitx5-configtool
+```
+
+Notes:
+
+- `sway/.config/sway/config` preserves the old i3-style keybindings, workspaces, colors, app placement, and border behavior.
+- `sway/.config/kanshi/config` auto-switches monitor layouts for laptop-only, DisplayPort, and HDMI profiles.
+- `dmenu_run` is replaced by `wofi --show drun`.
+- Wofi is configured under `sway/.config/wofi` and launched by `Super+d`.
+- `xss-lock`/`i3lock` are replaced by `swayidle`/`swaylock`.
+- `maim`/`xclip` screenshot flow is replaced by `grim`/`slurp`/`wl-copy`.
+- `nitrogen` wallpaper restore is replaced by `swaybg`; update the wallpaper path in `sway/.config/sway/config` if needed.
+- Electron apps such as Discord and Obsidian need `xorg-xwayland` and working desktop portals. The Sway config imports Wayland/Sway environment variables into systemd/dbus so `xdg-desktop-portal` can start correctly.
+- The `sway` target also provides `~/.local/bin/discord`, `~/.local/bin/obsidian`, and matching local `.desktop` overrides to force Electron apps onto Wayland. This avoids Discord failing with `Missing X server or $DISPLAY`.
+- The `sway` target installs `~/.config/autostart/picom.desktop` with `Hidden=true` so `dex --autostart --environment sway` does not start Picom. Picom is X11-only and will show warnings under Wayland/Sway.
+- On NVIDIA machines, start Sway with `start-sway` from this repo instead of plain `sway`. The wrapper exports NVIDIA/wlroots variables and launches `sway --unsupported-gpu` before Sway initializes its DRM backend.
+
+NVIDIA driver checklist:
+
+```bash
+yay -Syu --needed nvidia-open-dkms nvidia-utils egl-wayland linux-headers
+sudo mkinitcpio -P
+reboot
+
+nvidia-smi
+lsmod | grep nvidia
+swaymsg -t get_outputs
+```
+
+If `swaymsg -t get_outputs` shows only `Unknown-1`, Sway/wlroots is not seeing real DRM connectors. Verify the NVIDIA kernel module is loaded and the running kernel matches installed headers/modules (`uname -r`, `pacman -Q linux linux-headers nvidia-open-dkms nvidia-utils`).
+
+### Legacy X11/i3 stack
+
+Keep this only if the user explicitly wants the old X11/i3 session too:
 
 ```bash
 yay -S --needed \
@@ -157,16 +241,6 @@ Notes:
 - `i3/.config/i3/config` references `dmenu_run`, `i3status`, `xss-lock`, `i3lock`, `nm-applet`, `pactl`, and `dex`.
 - `x/.xinitrc` currently has `exec i3` commented out. Uncomment it if using `startx` to launch i3.
 
-### Optional Wayland/Sway stack
-
-No Sway config is currently stored in this repo. Install this only if the user wants Sway:
-
-```bash
-yay -S --needed \
-  sway swaybg swayidle swaylock waybar bemenu mako \
-  wl-clipboard wofi kanshi grim slurp pamixer playerctl
-```
-
 ### Applications
 
 ```bash
@@ -181,7 +255,7 @@ Always dry-run first from the repo root:
 
 ```bash
 cd ~/dotfiles
-STOW_TARGETS="zsh nvim alacritty vim x i3 picom polybar dunst fonts"
+STOW_TARGETS="zsh nvim alacritty kitty vim x sway i3 picom polybar dunst fontconfig fonts"
 stow --simulate --verbose $STOW_TARGETS
 ```
 
@@ -191,8 +265,8 @@ If dry-run reports conflicts, back up existing real files before stowing:
 mkdir -p ~/dotfiles-backup
 for p in \
   ~/.zshrc ~/.zprofile ~/.vimrc ~/.xinitrc ~/.xprofile \
-  ~/.config/nvim ~/.config/alacritty ~/.config/i3 ~/.config/i3status \
-  ~/.config/picom ~/.config/polybar ~/.config/dunst \
+  ~/.config/nvim ~/.config/alacritty ~/.config/kitty ~/.config/sway ~/.config/i3 ~/.config/i3status \
+  ~/.config/picom ~/.config/polybar ~/.config/dunst ~/.config/fontconfig \
   ~/.local/share/fonts; do
   if [ -e "$p" ] && [ ! -L "$p" ]; then
     mv "$p" ~/dotfiles-backup/
@@ -214,8 +288,8 @@ stow --restow --verbose $STOW_TARGETS
 ```bash
 for p in \
   ~/.zshrc ~/.zprofile ~/.vimrc ~/.xinitrc ~/.xprofile \
-  ~/.config/nvim ~/.config/alacritty ~/.config/i3 ~/.config/i3status \
-  ~/.config/picom ~/.config/polybar ~/.config/dunst \
+  ~/.config/nvim ~/.config/alacritty ~/.config/kitty ~/.config/sway ~/.config/i3 ~/.config/i3status \
+  ~/.config/picom ~/.config/polybar ~/.config/dunst ~/.config/fontconfig \
   ~/.local/share/fonts; do
   if [ -L "$p" ]; then
     printf 'OK symlink: %s -> %s\n' "$p" "$(readlink "$p")"
@@ -230,11 +304,15 @@ Do not use `ls -la ~ | grep '^l'` as the only verification; it misses symlinks u
 ### Commands
 
 ```bash
-for c in git zsh vim nvim alacritty stow fc-cache fc-list yay; do
+for c in git zsh vim nvim alacritty kitty stow fc-cache fc-list yay; do
   command -v "$c" >/dev/null && echo "OK $c" || echo "MISSING $c"
 done
 
 for c in i3 i3status dmenu_run picom polybar dunst xss-lock i3lock nm-applet pactl dex; do
+  command -v "$c" >/dev/null && echo "OK $c" || echo "MISSING $c"
+done
+
+for c in sway swaymsg swaybg swayidle swaylock kanshi wofi mako grim slurp wl-copy Xwayland xdg-desktop-portal xdg-desktop-portal-wlr; do
   command -v "$c" >/dev/null && echo "OK $c" || echo "MISSING $c"
 done
 ```
@@ -253,6 +331,8 @@ nvim --headless '+quit'
 
 fc-cache -fv ~/.local/share/fonts
 fc-list | grep -Ei 'FiraCode|JetBrains'
+fc-match 'sans:lang=zh-tw'
+fc-match 'emoji'
 ```
 
 Alacritty has no pure config-check command. A short startup is acceptable; VM/remote graphics warnings are not dotfile failures if Alacritty reports the config file loaded:
@@ -266,6 +346,15 @@ i3 config validation requires `i3` to be installed:
 ```bash
 i3 -C -c ~/.config/i3/config
 ```
+
+Sway config validation requires `sway` to be installed:
+
+```bash
+sway -C -c ~/.config/sway/config
+timeout 2 kanshi -c ~/.config/kanshi/config || true
+```
+
+`kanshi` may print `no profile matched` during validation if the current test environment uses different output names. That is not a syntax failure; use `swaymsg -t get_outputs` to inspect connector names and add/update profiles in `sway/.config/kanshi/config`.
 
 ## 8. Post-install user settings
 
@@ -301,7 +390,7 @@ In Obsidian: Open vault -> select `~/vault`.
 - Old guide used the wrong filename spelling (`ARCH_LINUX_REINSTALL.md`).
 - Old guide stowed only five targets and missed `i3`, `picom`, `polybar`, `dunst`, and `fonts`.
 - `nvim` is a submodule; when SSH/known_hosts is not ready, it remains empty and `git submodule status` starts with `-`.
-- Old guide emphasized Sway, but this repo contains X11/i3 configs and no Sway config.
+- The repo now includes a `sway` stow target that ports the old i3 workflow to Wayland/Sway.
 - `chsh -s /bin/zsh kao` was hard-coded. Use the current user and `command -v zsh`.
 - Token-style `git remote set-url origin https://Michael-Kao@github.com/...` is not a reliable SSH fix.
 - `zsh/.zshrc` had `export PATH="$PATH:$/home/kao/.cargo/bin"`; the extra `$` prevented the intended Cargo path from being added. It is now `export PATH="$PATH:$HOME/.cargo/bin"`.

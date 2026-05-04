@@ -1,0 +1,22 @@
+#!/usr/bin/env sh
+
+# Force bundled Discord/Electron to use Wayland under Sway.
+# Without these flags it may default to X11 and fail with:
+#   Missing X server or $DISPLAY
+#
+# NVIDIA note: Discord/Electron can flicker badly when unfocused on wlroots
+# compositors with accelerated Ozone/Wayland rendering. Keep Wayland, but use
+# safer compositing flags to avoid the unfocused-window flicker.
+export XDG_CURRENT_DESKTOP=sway
+export ELECTRON_OZONE_PLATFORM_HINT=wayland
+export __GL_THREADED_OPTIMIZATIONS=0
+
+exec /opt/discord/Discord \
+  --enable-features=UseOzonePlatform \
+  --disable-features=WaylandWindowDecorations \
+  --ozone-platform=wayland \
+  --enable-wayland-ime \
+  --disable-gpu-compositing \
+  --disable-zero-copy \
+  --disable-gpu-memory-buffer-video-frames \
+  "$@"

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Obsidian
+Comment=Knowledge base
+Exec=/home/kao/.local/bin/obsidian %u
+Terminal=false
+Type=Application
+Icon=obsidian
+StartupWMClass=obsidian
+MimeType=x-scheme-handler/obsidian;
+Categories=Office;

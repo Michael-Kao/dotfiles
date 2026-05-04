@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Picom
+Exec=picom
+Hidden=true
+NoDisplay=true
+Comment=Disabled under Sway; picom is an X11 compositor and should not autostart in Wayland.

@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+
+# NVIDIA + wlroots/Sway launcher.
+# Use this instead of running `sway` directly on machines with the proprietary
+# or open NVIDIA kernel modules.
+
+export XDG_CURRENT_DESKTOP=sway
+export XDG_SESSION_DESKTOP=sway
+export WLR_NO_HARDWARE_CURSORS=1
+export GBM_BACKEND=nvidia-drm
+export __GLX_VENDOR_LIBRARY_NAME=nvidia
+export LIBVA_DRIVER_NAME=nvidia
+
+exec /usr/bin/sway --unsupported-gpu "$@"

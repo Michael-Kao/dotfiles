@@ -1,0 +1,58 @@
+* {
+  font-family: "FiraCode Nerd Font Mono", "Noto Sans CJK TC", "Noto Color Emoji", sans-serif;
+  font-size: 14px;
+}
+
+window {
+  margin: 0;
+  border: 2px solid #b4befe;
+  border-radius: 14px;
+  background-color: #1e1e2e;
+  color: #cdd6f4;
+}
+
+#outer-box {
+  margin: 12px;
+  background-color: transparent;
+}
+
+#input {
+  margin: 0 0 12px 0;
+  padding: 10px 12px;
+  border: 1px solid #45475a;
+  border-radius: 10px;
+  background-color: #313244;
+  color: #cdd6f4;
+}
+
+#input:focus {
+  border-color: #b4befe;
+}
+
+#scroll {
+  background-color: transparent;
+}
+
+#inner-box {
+  background-color: transparent;
+}
+
+#entry {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background-color: transparent;
+  color: #cdd6f4;
+}
+
+#entry:selected {
+  background-color: #b4befe;
+  color: #1e1e2e;
+}
+
+#img {
+  margin-right: 10px;
+}
+
+#text {
+  color: inherit;
+}

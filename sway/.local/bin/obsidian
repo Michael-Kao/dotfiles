@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+
+# Keep Obsidian/Electron on Wayland for consistency with Sway.
+export XDG_CURRENT_DESKTOP=sway
+export ELECTRON_OZONE_PLATFORM_HINT=wayland
+
+exec /usr/bin/obsidian \
+  --enable-features=UseOzonePlatform,WaylandWindowDecorations \
+  --ozone-platform=wayland \
+  --enable-wayland-ime \
+  "$@"

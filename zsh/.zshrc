@@ -26,3 +26,8 @@ prompt pure
 #prompt walters
 #
 #
+
+
+# opencode
+export PATH=/home/kao/.opencode/bin:$PATH
+export PATH="$HOME/.local/bin:$PATH"
