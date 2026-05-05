@@ -3,7 +3,7 @@
 
 set $mod Mod4
 set $term kitty
-set $menu wofi --show drun --conf $HOME/.config/wofi/config --style $HOME/.config/wofi/style.css
+set $menu rofi -show drun -config $HOME/.config/rofi/config.rasi
 set $lock swaylock -f -c 000000
 set $refresh_status killall -SIGUSR1 i3status
 
@@ -196,8 +196,9 @@ for_window [class=".*"] border pixel 0
 # include ~/.local/bin even when an interactive shell does.
 exec /home/kao/.local/bin/autotiling
 
-# Wayland wallpaper replaces nitrogen. Change the path if your wallpaper lives elsewhere.
-exec_always sh -c 'pkill swaybg; [ -f "$HOME/Pictures/wallpaper.jpg" ] && swaybg -i "$HOME/Pictures/wallpaper.jpg" -m fill'
+# Per-monitor wallpapers.
+# DP-2: main 2560x1440 monitor; DP-3: side 1920x1080 monitor.
+exec_always sh -c 'pkill swaybg; swaybg -o DP-2 -i "$HOME/dotfiles/wallpapers/romantic-night-sky-2560x1440-25549.jpg" -m fill -o DP-3 -i "$HOME/dotfiles/wallpapers/japan-artistic-1920x1080-25406.jpg" -m fill'
 
 focus_follows_mouse no
 

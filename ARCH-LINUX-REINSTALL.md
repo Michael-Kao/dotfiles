@@ -15,7 +15,7 @@ Stow targets in this repo:
 - `vim` -> `~/.vimrc`
 - `x` -> `~/.xinitrc`, `~/.xprofile`
 - `sway` -> `~/.config/sway`
-- `sway` also manages `~/.config/wofi`, `~/.config/kanshi`, local Electron launchers, and Sway helper scripts
+- `sway` also manages `~/.config/rofi`, `~/.config/kanshi`, local Electron launchers, and Sway helper scripts
 - `i3` -> `~/.config/i3`, `~/.config/i3status`
 - `picom` -> `~/.config/picom`
 - `polybar` -> `~/.config/polybar`
@@ -188,7 +188,7 @@ Sway is the daily-driver window manager. The `sway` stow target ports the old i3
 ```bash
 yay -S --needed \
   sway swaybg swayidle swaylock \
-  kanshi wofi mako wl-clipboard grim slurp \
+  kanshi rofi mako wl-clipboard grim slurp \
   xorg-xwayland xdg-desktop-portal xdg-desktop-portal-wlr xdg-desktop-portal-gtk \
   i3status dex network-manager-applet \
   libpulse pipewire pipewire-pulse \
@@ -199,8 +199,8 @@ Notes:
 
 - `sway/.config/sway/config` preserves the old i3-style keybindings, workspaces, colors, app placement, and border behavior.
 - `sway/.config/kanshi/config` auto-switches monitor layouts for laptop-only, DisplayPort, and HDMI profiles.
-- `dmenu_run` is replaced by `wofi --show drun`.
-- Wofi is configured under `sway/.config/wofi` and launched by `Super+d`.
+- `dmenu_run` is replaced by `rofi -show drun`.
+- Rofi is configured under `sway/.config/rofi` and launched by `Super+d`.
 - `xss-lock`/`i3lock` are replaced by `swayidle`/`swaylock`.
 - `maim`/`xclip` screenshot flow is replaced by `grim`/`slurp`/`wl-copy`.
 - `nitrogen` wallpaper restore is replaced by `swaybg`; update the wallpaper path in `sway/.config/sway/config` if needed.
@@ -312,7 +312,7 @@ for c in i3 i3status dmenu_run picom polybar dunst xss-lock i3lock nm-applet pac
   command -v "$c" >/dev/null && echo "OK $c" || echo "MISSING $c"
 done
 
-for c in sway swaymsg swaybg swayidle swaylock kanshi wofi mako grim slurp wl-copy Xwayland xdg-desktop-portal xdg-desktop-portal-wlr; do
+for c in sway swaymsg swaybg swayidle swaylock kanshi rofi mako grim slurp wl-copy Xwayland xdg-desktop-portal xdg-desktop-portal-wlr; do
   command -v "$c" >/dev/null && echo "OK $c" || echo "MISSING $c"
 done
 ```

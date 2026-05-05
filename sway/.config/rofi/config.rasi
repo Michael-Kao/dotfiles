@@ -1,0 +1,95 @@
+configuration {
+  modi: "drun,run,window";
+  show-icons: true;
+  icon-theme: "hicolor";
+  terminal: "kitty";
+  drun-display-format: "{name}";
+  matching: "fuzzy";
+  sort: true;
+  case-sensitive: false;
+  display-drun: "Apps";
+  display-run: "Run";
+  display-window: "Windows";
+}
+
+* {
+  bg: #1e1e2e;
+  bg-alt: #313244;
+  fg: #cdd6f4;
+  muted: #a6adc8;
+  accent: #b4befe;
+  urgent: #f38ba8;
+
+  background-color: transparent;
+  text-color: @fg;
+  font: "FiraCode Nerd Font Mono 14";
+}
+
+window {
+  width: 720px;
+  border: 2px;
+  border-color: @accent;
+  border-radius: 14px;
+  background-color: @bg;
+}
+
+mainbox {
+  padding: 12px;
+  spacing: 12px;
+  background-color: @bg;
+}
+
+inputbar {
+  padding: 10px 12px;
+  border: 1px;
+  border-color: #45475a;
+  border-radius: 10px;
+  background-color: @bg-alt;
+  children: [ prompt, entry ];
+}
+
+prompt {
+  text-color: @accent;
+  margin: 0 10px 0 0;
+}
+
+entry {
+  placeholder: "Search applications";
+  placeholder-color: @muted;
+}
+
+listview {
+  lines: 12;
+  columns: 1;
+  fixed-height: false;
+  scrollbar: false;
+  spacing: 4px;
+  background-color: @bg;
+}
+
+element {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background-color: transparent;
+  text-color: @fg;
+}
+
+element selected {
+  background-color: @accent;
+  text-color: @bg;
+}
+
+element-icon {
+  size: 24px;
+  margin: 0 10px 0 0;
+}
+
+element-text {
+  text-color: inherit;
+}
+
+message {
+  padding: 10px;
+  border-radius: 10px;
+  background-color: @bg-alt;
+}

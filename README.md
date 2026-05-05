@@ -45,9 +45,9 @@ Use this to check connector names when adding a new monitor/dock:
 swaymsg -t get_outputs
 ```
 
-## Wofi launcher
+## Rofi launcher
 
-The Sway target also manages Wofi for `Super+d` application launching:
+The Sway target also manages Rofi for `Super+d` application launching:
 
 ```bash
 stow --restow sway
@@ -57,8 +57,7 @@ swaymsg reload
 Config files:
 
 ```bash
-sway/.config/wofi/config
-sway/.config/wofi/style.css
+sway/.config/rofi/config.rasi
 ```
 
 ## Audio AUX routing
